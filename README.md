@@ -28,7 +28,7 @@ mp3skull('the beatles hello goodbye', function (err, tracks) {
 }
 ```
 
-*Note that the fields marked with ? prefixed may be undefined for certain tracks.*
+*Note that the fields marked with ? suffixed may be undefined for certain tracks.*
 
 ### mp3skull(terms, [options], done)
 Search MP3 tracks on mp3skull.
