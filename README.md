@@ -28,7 +28,7 @@ mp3skull('the beatles hello goodbye', function (err, tracks) {
 }
 ```
 
-*Note that the fields marked with *?* may be undefined for certain tracks.*
+*Note that the fields marked with ? prefixed may be undefined for certain tracks.*
 
 ### mp3skull(terms, [options], done)
 Search MP3 tracks on mp3skull.
@@ -37,7 +37,7 @@ Search MP3 tracks on mp3skull.
 
 `options` is an optional object that's passed into the *needle* requests.
 
-`done` returns an array of `track`s
+`done` returns an array of `tracks`.
 
 ## License
 MIT
