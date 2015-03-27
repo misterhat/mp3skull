@@ -5,7 +5,7 @@ var format = require('util').format,
     lazystream = require('lazystream'),
     needle = require('needle');
 
-var URL = 'http://mp3skull.com/search_db.php?q=%s&fckh=%s';
+var URL = 'https://mp3skull.to/search_db.php?q=%s&fckh=%s';
 
 var search;
 
