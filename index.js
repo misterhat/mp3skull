@@ -5,7 +5,7 @@ var format = require('util').format,
     lazystream = require('lazystream'),
     needle = require('needle');
 
-var URL = 'https://mp3skull.to/search_db.php?q=%s&fckh=%s';
+var URL = 'https://mp3skull.cr/search_db.php?q=%s&fckh=%s';
 
 var search;
 
@@ -96,7 +96,7 @@ search = (function () {
 
             $('#song_html').each(function () {
                 var track = ($('#right_song b', this).text() || '').trim(),
-                    direct = $('#right_song a', this).attr('href'),
+                    direct = $('a[rel="nofollow"]', this).attr('href'),
                     meta = ($('.left', this).html() || '').trim(),
 
                     bitrate, duration, size;
