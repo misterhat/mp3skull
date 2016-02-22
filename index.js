@@ -1,6 +1,5 @@
 var format = require('util').format,
     stream = require('stream'),
-
     cheerio = require('cheerio'),
     lazystream = require('lazystream'),
     needle = require('needle');
@@ -24,10 +23,10 @@ function parseDuration(time) {
     return seconds;
 }
 
-function getSession(options, done) {
+function getSession(domain, options, done) {
     // It's 4kb vs 16kb using an invalid search instead of the homepage to fetch
     // the session identifier.
-    needle.get(format(URL, 'x'), options, function (err, res, body) {
+    needle.get(domain, options, function (err, res, body) {
         var $, session;
 
         if (err) {
@@ -49,8 +48,24 @@ function getSession(options, done) {
     });
 }
 
+function getDomain(done) {
+    needle.head(URL, function (err, res) {
+        if (err) {
+            return done(err);
+        }
+
+        if (typeof res.headers.location !== 'undefined') {
+            done(null, res.headers.location);
+        }
+        else {
+            done(null, URL);
+        }
+    });
+}
+
 search = (function () {
     var session;
+    var domain;
 
     return function (terms, options, done) {
         var url;
@@ -60,8 +75,20 @@ search = (function () {
             options = {};
         }
 
+        if (!domain) {
+            return getDomain(function (err, domainName) {
+                if (err) {
+                    return done(err);
+                }
+
+                domain = domainName;
+
+                search(terms, options, done);
+            });
+        }
+
         if (!session) {
-            return getSession(options, function (err, newSession) {
+            return getSession(domain, options, function (err, newSession) {
                 if (err) {
                     return done(err);
                 }
@@ -72,7 +99,7 @@ search = (function () {
             });
         }
 
-        url = format(URL, terms, session);
+        url = format(domain, terms, session);
 
         needle.get(url, options, function (err, res, body) {
             var $, tracks;

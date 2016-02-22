@@ -1,6 +1,6 @@
 {
   "name": "mp3skull",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Search and stream MP3s from mp3skull.",
   "main": "index.js",
   "keywords": [
