@@ -1,13 +1,15 @@
 var format = require('util').format,
     stream = require('stream'),
+
     cheerio = require('cheerio'),
     lazystream = require('lazystream'),
     needle = require('needle');
 
-var URL = 'https://mp3skull.cr/search_db.php?q=%s&fckh=%s';
+var URL = 'https://mp3skull.is/search_db.php?q=%s&fckh=%s';
 
 var search;
 
+// Convert the minute:seconds format into seconds.
 function parseDuration(time) {
     var seconds;
 
@@ -23,10 +25,10 @@ function parseDuration(time) {
     return seconds;
 }
 
-function getSession(domain, options, done) {
-    // It's 4kb vs 16kb using an invalid search instead of the homepage to fetch
-    // the session identifier.
-    needle.get(domain, options, function (err, res, body) {
+function getSession(options, done) {
+    // It's 4kb vs 16kb using an invalid search instead of the homepage to
+    // fetch the session identifier.
+    needle.get(URL, options, function (err, res, body) {
         var $, session;
 
         if (err) {
@@ -41,31 +43,15 @@ function getSession(domain, options, done) {
         }
 
         if (!session) {
-            return done(new Error('No session found.'));
-        }
-
-        done(null, session);
-    });
-}
-
-function getDomain(done) {
-    needle.head(URL, function (err, res) {
-        if (err) {
-            return done(err);
-        }
-
-        if (typeof res.headers.location !== 'undefined') {
-            done(null, res.headers.location);
-        }
-        else {
-            done(null, URL);
+            done(new Error('No session found.'));
+        } else {
+            done(null, session);
         }
     });
 }
 
 search = (function () {
     var session;
-    var domain;
 
     return function (terms, options, done) {
         var url;
@@ -75,31 +61,21 @@ search = (function () {
             options = {};
         }
 
-        if (!domain) {
-            return getDomain(function (err, domainName) {
-                if (err) {
-                    return done(err);
-                }
-
-                domain = domainName;
-
-                search(terms, options, done);
-            });
-        }
+        // mp3skull changes domains often, so ensure redirects are allowed
+        options.follow_max = 5;
 
         if (!session) {
-            return getSession(domain, options, function (err, newSession) {
+            return getSession(options, function (err, newSession) {
                 if (err) {
                     return done(err);
                 }
 
                 session = newSession;
-
                 search(terms, options, done);
             });
         }
 
-        url = format(domain, terms, session);
+        url = format(URL, terms, session);
 
         needle.get(url, options, function (err, res, body) {
             var $, tracks;
